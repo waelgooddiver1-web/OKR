@@ -4,96 +4,99 @@
   <meta charset="UTF-8" />
   <title>Digital Business Card</title>
 
-  <!-- Supabase JS v2 -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <!-- Supabase JS -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #f4f6f8;
       padding: 40px;
     }
-    .ok {
-      color: green;
-      font-weight: bold;
-    }
-    .err {
-      color: red;
-      font-weight: bold;
-    }
     .card {
-      margin-top: 20px;
-      border: 1px solid #ddd;
+      max-width: 420px;
+      background: #fff;
+      border-radius: 12px;
       padding: 20px;
-      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.1);
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .logo img {
+      max-width: 120px;
+    }
+    h2 {
+      margin: 10px 0 5px;
+    }
+    p {
+      margin: 6px 0;
+      color: #444;
+    }
+    .error {
+      color: red;
     }
   </style>
 </head>
 <body>
 
-  <h1>Digital Business Card</h1>
-  <div id="result">Loading...</div>
+<div id="app">Loading card...</div>
 
-  <script>
-    /* =========================
-       Supabase Configuration
-    ========================== */
-    const SUPABASE_URL = "https://sdrvubvyjwyjecajvtx.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_5_fjG8reGX01qXnxK8kYTA_13qAppc";
+<script>
+  const SUPABASE_URL = "https://sdrvubyjwyycajvtx.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_XXXXXXXXXXXXXXXXXXXX"; // نفس المفتاح عندك
+  const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const supabase = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get("slug");
+  const app = document.getElementById("app");
 
-    /* =========================
-       Read slug from URL
-    ========================== */
-    const params = new URLSearchParams(window.location.search);
-    const slug = params.get("slug");
-    const resultEl = document.getElementById("result");
+  if (!slug) {
+    app.innerHTML = "<p class='error'>❌ Missing slug</p>";
+  } else {
+    loadCard(slug);
+  }
 
-    if (!slug) {
-      resultEl.innerHTML = "<span class='err'>❌ Missing slug</span>";
-    } else {
-      loadCard(slug);
+  async function loadCard(slug) {
+    const { data, error } = await supabase
+      .from("cards")
+      .select(`
+        full_name,
+        job_title,
+        company,
+        phone,
+        email,
+        whatsapp,
+        photo_url,
+        logo_url
+      `)
+      .eq("profile_slug", slug)
+      .eq("is_active", true)
+      .single();
+
+    if (error || !data) {
+      console.error(error);
+      app.innerHTML = "<p class='error'>❌ Card not found</p>";
+      return;
     }
 
-    /* =========================
-       Load Card Data
-    ========================== */
-    async function loadCard(slug) {
-      try {
-        const { data, error } = await supabase
-          .from("cards")            // ✅ استخدم الجدول مباشرة
-          .select("*")
-          .eq("profile_slug", slug)
-          .eq("is_active", true)
-          .single();
-
-        if (error || !data) {
-          console.error(error);
-          resultEl.innerHTML = "<span class='err'>❌ Card not found</span>";
-          return;
-        }
-
-        resultEl.innerHTML = `
-          <div class="ok">✅ Card Found</div>
-          <div class="card">
-            <p><strong>Name:</strong> ${data.full_name}</p>
-            <p><strong>Job:</strong> ${data.job_title}</p>
-            <p><strong>Company:</strong> ${data.company}</p>
-            <p><strong>Phone:</strong> ${data.phone}</p>
-            <p><strong>Email:</strong> ${data.email}</p>
-            <p><strong>WhatsApp:</strong> ${data.whatsapp}</p>
-          </div>
-        `;
-
-      } catch (e) {
-        console.error(e);
-        resultEl.innerHTML = "<span class='err'>❌ Unexpected error</span>";
-      }
-    }
-  </script>
+    app.innerHTML = `
+      <div class="card">
+        <div class="logo">
+          ${data.logo_url ? `<img src="${data.logo_url}" />` : ""}
+        </div>
+        <h2>${data.full_name}</h2>
+        <p><strong>${data.job_title}</strong></p>
+        <p>${data.company}</p>
+        <hr>
+        <p>📞 ${data.phone}</p>
+        <p>📧 ${data.email}</p>
+        <p>💬 ${data.whatsapp}</p>
+      </div>
+    `;
+  }
+</script>
 
 </body>
 </html>
