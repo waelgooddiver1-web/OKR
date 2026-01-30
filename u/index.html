@@ -13,54 +13,72 @@
       background: #f4f6f8;
       padding: 40px;
     }
+
     .card {
       max-width: 420px;
       background: #fff;
       border-radius: 12px;
       padding: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
+
     .logo {
       text-align: center;
       margin-bottom: 15px;
     }
+
     .logo img {
       max-width: 120px;
     }
+
     h2 {
       margin: 10px 0 5px;
     }
+
     p {
       margin: 6px 0;
       color: #444;
     }
+
     .error {
       color: red;
+      font-weight: bold;
     }
   </style>
 </head>
+
 <body>
 
 <div id="app">Loading card...</div>
 
 <script>
-  const SUPABASE_URL = "https://sdrvubyjwyycajvtx.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_XXXXXXXXXXXXXXXXXXXX"; // نفس المفتاح عندك
-  const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_KEY);
+  /* =========================
+     Supabase Configuration
+  ========================= */
+  const SUPABASE_URL = "https://sdrvubyyjwycajvtx.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_xxxxxxxxxxxxxxxxxxxxx"; // مفتاحك العام فقط
 
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  /* =========================
+     Read slug from URL
+  ========================= */
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("slug");
   const app = document.getElementById("app");
 
   if (!slug) {
-    app.innerHTML = "<p class='error'>❌ Missing slug</p>";
+    app.innerHTML = `<p class="error">❌ Missing slug</p>`;
   } else {
     loadCard(slug);
   }
 
+  /* =========================
+     Load Card Data
+  ========================= */
   async function loadCard(slug) {
     const { data, error } = await supabase
-      .from("cards")
+      .from("cards")              // ✅ جدول حقيقي
       .select(`
         full_name,
         job_title,
@@ -77,7 +95,7 @@
 
     if (error || !data) {
       console.error(error);
-      app.innerHTML = "<p class='error'>❌ Card not found</p>";
+      app.innerHTML = `<p class="error">❌ Card not found</p>`;
       return;
     }
 
@@ -86,10 +104,13 @@
         <div class="logo">
           ${data.logo_url ? `<img src="${data.logo_url}" />` : ""}
         </div>
+
         <h2>${data.full_name}</h2>
         <p><strong>${data.job_title}</strong></p>
         <p>${data.company}</p>
+
         <hr>
+
         <p>📞 ${data.phone}</p>
         <p>📧 ${data.email}</p>
         <p>💬 ${data.whatsapp}</p>
