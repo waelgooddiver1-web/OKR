@@ -5,7 +5,7 @@
   <title>Digital Business Card</title>
 
   <!-- Supabase JS -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <style>
     body {
@@ -13,36 +13,31 @@
       background: #f4f6f8;
       padding: 40px;
     }
-
     .card {
       max-width: 420px;
       background: #fff;
-      border-radius: 12px;
+      margin: auto;
       padding: 20px;
+      border-radius: 12px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
-
     .logo {
       text-align: center;
       margin-bottom: 15px;
     }
-
     .logo img {
       max-width: 120px;
     }
-
     h2 {
       margin: 10px 0 5px;
     }
-
     p {
       margin: 6px 0;
       color: #444;
     }
-
     .error {
       color: red;
-      font-weight: bold;
+      text-align: center;
     }
   </style>
 </head>
@@ -52,19 +47,16 @@
 <div id="app">Loading card...</div>
 
 <script>
-  /* =========================
-     Supabase Configuration
-  ========================= */
-  const SUPABASE_URL = "https://sdrvubyyjwycajvtx.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_xxxxxxxxxxxxxxxxxxxxx"; // مفتاحك العام فقط
+  // 🔐 Supabase config
+  const SUPABASE_URL = "https://sdrvubyvjywyeacjvtx.supabase.co";
+  const SUPABASE_KEY = "PUT_YOUR_PUBLIC_ANON_KEY_HERE";
 
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const supabase = supabasejs.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  /* =========================
-     Read slug from URL
-  ========================= */
+  // 📌 Read slug from URL
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("slug");
+
   const app = document.getElementById("app");
 
   if (!slug) {
@@ -73,12 +65,9 @@
     loadCard(slug);
   }
 
-  /* =========================
-     Load Card Data
-  ========================= */
   async function loadCard(slug) {
     const { data, error } = await supabase
-      .from("cards")              // ✅ جدول حقيقي
+      .from("cards")
       .select(`
         full_name,
         job_title,
@@ -108,11 +97,10 @@
         <h2>${data.full_name}</h2>
         <p><strong>${data.job_title}</strong></p>
         <p>${data.company}</p>
-
         <hr>
 
         <p>📞 ${data.phone}</p>
-        <p>📧 ${data.email}</p>
+        <p>✉️ ${data.email}</p>
         <p>💬 ${data.whatsapp}</p>
       </div>
     `;
