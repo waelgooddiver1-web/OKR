@@ -1,1 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Digital Business Card</title>
 
+  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 40px;
+    }
+    .card {
+      max-width: 420px;
+      background: #fff;
+      margin: auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .logo img {
+      max-width: 120px;
+    }
+    h2 {
+      margin: 10px 0 5px;
+    }
+    p {
+      margin: 6px 0;
+      color: #444;
+    }
+    .error {
+      color: red;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="app">Loading card...</div>
+
+<script>
+  const SUPABASE_URL = "https://sdrvubyvjywyeacjvtx.supabase.co";
+  const SUPABASE_KEY = "YOUR_ANON_KEY_HERE";
+
+  const supabase = supabasejs.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get("slug");
+  const app = document.getElementById("app");
+
+  if (!slug) {
+    app.innerHTML = `<p class="error">❌ Missing slug</p>`;
+  } else {
+    loadCard(slug);
+  }
+
+  async function loadCard(slug) {
+    const { data, error } = await supabase
+      .from("cards")
+      .select(`
+        full_name,
+        job_title,
+        company,
+        phone,
+        email,
+        whatsapp,
+        photo_url,
+        logo_url
+      `)
+      .eq("profile_slug", slug)
+      .eq("is_active", true)
+      .single();
+
+    if (error || !data) {
+      console.error(error);
+      app.innerHTML = `<p class="error">❌ Card not found</p>`;
+      return;
+    }
+
+    app.innerHTML = `
+      <div class="card">
+        <div class="logo">
+          ${data.logo_url ? `<img src="${data.logo_url}" />` : ""}
+        </div>
+        <h2>${data.full_name}</h2>
+        <p><strong>${data.job_title}</strong></p>
+        <p>${data.company}</p>
+        <hr>
+        <p>📞 ${data.phone}</p>
+        <p>✉️ ${data.email}</p>
+        <p>💬 ${data.whatsapp}</p>
+      </div>
+    `;
+  }
+</script>
+
+</body>
+</html>
