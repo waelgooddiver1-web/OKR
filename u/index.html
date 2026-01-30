@@ -1,12 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Card</title>
+  <title>Digital Business Card</title>
 </head>
-<body>
-  <h2>Digital Business Card</h2>
+
+<body style="font-family:Arial; text-align:center; margin-top:40px;">
+
+  <h2>Supabase Test Page</h2>
+  <div id="result">Loading...</div>
+
+  <script>
+    const slug = new URLSearchParams(window.location.search).get("slug");
+
+    const SUPABASE_URL = "https://sdrvubyvjywjecajvtx.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_5_fjG8reGX01qXnxK8kYTA_13qAppc";
+
+    fetch(`${SUPABASE_URL}/rest/v1/cards_with_url?profile_slug=eq.${slug}`, {
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("result").innerHTML =
+        data.length ? "✅ Card Found" : "❌ Card NOT Found";
+    })
+    .catch(err => {
+      document.getElementById("result").innerHTML = "❌ Error";
+      console.error(err);
+    });
+  </script>
+
 </body>
 </html>
-const SUPABASE_URL = "https://sdrvubyvjywjecajvtx.supabase.co";
-const SUPABASE_KEY = "sb_publishable_5_fjG8reGX01qXnxK8kYTA_13qAppc";
