@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Digital Business Card</title>
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -23,7 +23,7 @@
   const SUPABASE_URL = "https://sdrvubvyjwyyecajvtx.supabase.co";
   const SUPABASE_KEY = "sb_publishable_5_fjG8reGX01qXnxK8kYTA_13qAppc";
 
-  const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_KEY);
+ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // 🔍 Read slug from URL
   const params = new URLSearchParams(window.location.search);
@@ -39,7 +39,7 @@
 
   async function loadCard(slug) {
     try {
-      const { data, error } = await supabase
+         const { data, error } = await supabaseClient
         .from("cards_with_url")
         .select("*")
         .eq("profile_slug", slug)
