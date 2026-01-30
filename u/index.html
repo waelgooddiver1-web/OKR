@@ -4,66 +4,71 @@
   <meta charset="UTF-8" />
   <title>Digital Business Card</title>
 
-  <!-- Supabase UMD -->
+  <!-- Supabase JS v2 -->
   <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #f6f6f6;
       padding: 40px;
     }
-    .ok {
-      color: green;
-      font-weight: bold;
-    }
-    .err {
-      color: red;
-      font-weight: bold;
-    }
     .card {
-      margin-top: 20px;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      max-width: 400px;
+      max-width: 420px;
+      background: #fff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin-top: 0;
+    }
+    .label {
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+    }
+    .loading {
+      color: #555;
     }
   </style>
 </head>
 <body>
 
-  <h1>Supabase Test Page</h1>
-  <div id="result">Loading...</div>
+  <div id="app" class="card">
+    <div class="loading">Loading card…</div>
+  </div>
 
   <script>
-    /* =========================
-       Supabase Configuration
-    ========================== */
-    const SUPABASE_URL = "https://sdrvubvyjwycajvtx.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_5_fjG8reGXQ1qXnxk8kYTA_13qAppc";
+    /* ===============================
+       Supabase configuration
+    =============================== */
+    const SUPABASE_URL = "https://sdrvubyjvwyecajvtx.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_XXXXXXXXXXXXXXXXXXXXXXXX"; // نفس المفتاح عندك
 
-    // ✅ IMPORTANT: UMD uses window.supabase
-    const supabaseClient = window.supabase.createClient(
+    const supabaseClient = supabase.createClient(
       SUPABASE_URL,
       SUPABASE_KEY
     );
 
-    /* =========================
+    /* ===============================
        Read slug from URL
-    ========================== */
+    =============================== */
     const params = new URLSearchParams(window.location.search);
     const slug = params.get("slug");
 
-    const resultEl = document.getElementById("result");
+    const app = document.getElementById("app");
 
     if (!slug) {
-      resultEl.innerHTML = "<span class='err'>❌ Missing slug</span>";
+      app.innerHTML = `<div class="error">❌ Missing slug in URL</div>`;
     } else {
       loadCard(slug);
     }
 
-    /* =========================
-       Load Card by Slug
-    ========================== */
+    /* ===============================
+       Load card by profile_slug
+    =============================== */
     async function loadCard(slug) {
       try {
         const { data, error } = await supabaseClient
@@ -72,24 +77,25 @@
           .eq("profile_slug", slug)
           .single();
 
-        if (error) {
-          console.error("Supabase error:", error);
-          resultEl.innerHTML = "<span class='err'>❌ Error loading card</span>";
+        if (error || !data) {
+          console.error(error);
+          app.innerHTML = `<div class="error">❌ Card not found</div>`;
           return;
         }
 
-        resultEl.innerHTML = `
-          <div class="card">
-            <div class="ok">✅ Card Found</div>
-            <p><strong>Name:</strong> ${data.full_name}</p>
-            <p><strong>Job:</strong> ${data.job_title}</p>
-            <p><strong>Company:</strong> ${data.company}</p>
-            <p><strong>Phone:</strong> ${data.phone}</p>
-          </div>
+        app.innerHTML = `
+          <h1>${data.full_name}</h1>
+          <p><span class="label">Job:</span> ${data.job_title}</p>
+          <p><span class="label">Company:</span> ${data.company}</p>
+          <p><span class="label">Phone:</span> ${data.phone}</p>
+          <p><span class="label">Email:</span> ${data.email}</p>
+          <p><span class="label">WhatsApp:</span> ${data.whatsapp}</p>
+          <hr>
+          <small>Scans: ${data.scan_count}</small>
         `;
       } catch (e) {
-        console.error("JS error:", e);
-        resultEl.innerHTML = "<span class='err'>❌ Unexpected error</span>";
+        console.error(e);
+        app.innerHTML = `<div class="error">❌ Unexpected error</div>`;
       }
     }
   </script>
