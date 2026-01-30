@@ -3,29 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <title>Digital Business Card</title>
-  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 40px;
-    }
-    .ok { color: green; }
-    .err { color: red; }
-  </style>
-</head>
-<body>
-
-<h1>Supabase Test Page</h1>
-<div id="result">Loading...</div>
+ <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
 <script>
-  // 🔑 Supabase config
   const SUPABASE_URL = "https://sdrvubvyjwyyecajvtx.supabase.co";
   const SUPABASE_KEY = "sb_publishable_5_fjG8reGX01qXnxK8kYTA_13qAppc";
 
- const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // 🔍 Read slug from URL
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("slug");
 
@@ -38,32 +23,28 @@
   }
 
   async function loadCard(slug) {
-    try {
-         const { data, error } = await supabaseClient
-        .from("cards_with_url")
-        .select("*")
-        .eq("profile_slug", slug)
-        .single();
+    const { data, error } = await supabaseClient
+      .from("cards_with_url")
+      .select("*")
+      .eq("profile_slug", slug)
+      .single();
 
-      if (error) {
-        console.error(error);
-        resultEl.innerHTML = "<span class='err'>❌ Error</span>";
-        return;
-      }
-
-      resultEl.innerHTML = `
-        <div class="ok">✅ Card Found</div>
-        <p><strong>Name:</strong> ${data.full_name}</p>
-        <p><strong>Job:</strong> ${data.job_title}</p>
-        <p><strong>Company:</strong> ${data.company}</p>
-        <p><strong>Phone:</strong> ${data.phone}</p>
-      `;
-    } catch (e) {
-      console.error(e);
+    if (error) {
+      console.error(error);
       resultEl.innerHTML = "<span class='err'>❌ Error</span>";
+      return;
     }
+
+    resultEl.innerHTML = `
+      <div class="ok">✅ Card Found</div>
+      <p><strong>Name:</strong> ${data.full_name}</p>
+      <p><strong>Job:</strong> ${data.job_title}</p>
+      <p><strong>Company:</strong> ${data.company}</p>
+      <p><strong>Phone:</strong> ${data.phone}</p>
+    `;
   }
 </script>
+
 
 </body>
 </html>
