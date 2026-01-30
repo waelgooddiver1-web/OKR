@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Digital Business Card</title>
+  <title>Supabase Test</title>
 </head>
 
 <body style="font-family:Arial; text-align:center; margin-top:40px;">
@@ -18,17 +18,17 @@
 
     fetch(`${SUPABASE_URL}/rest/v1/cards_with_url?profile_slug=eq.${slug}`, {
       headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": "Bearer " + SUPABASE_KEY
+        apikey: SUPABASE_KEY,
+        Authorization: "Bearer " + SUPABASE_KEY
       }
     })
     .then(res => res.json())
     .then(data => {
-      document.getElementById("result").innerHTML =
+      document.getElementById("result").innerText =
         data.length ? "✅ Card Found" : "❌ Card NOT Found";
     })
     .catch(err => {
-      document.getElementById("result").innerHTML = "❌ Error";
+      document.getElementById("result").innerText = "❌ Error";
       console.error(err);
     });
   </script>
